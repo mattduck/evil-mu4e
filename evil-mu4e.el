@@ -47,7 +47,7 @@
   :group 'mu4e
   :type  'symbol)
 
-
+
 ;;; By default all mu4e modes except for mu4e-compose-mode will start in
 ;;; evil-emacs-state. This section makes all modes start in evil-motion-state.
 
@@ -64,7 +64,7 @@
     (evil-set-initial-state mode evil-mu4e-state)))
 
 
-
+
 ;;; Define bindings
 
 (defvar evil-mu4e-mode-map-bindings
@@ -72,11 +72,11 @@
     (,evil-mu4e-state mu4e-main-mode-map "j"               next-line)
     (,evil-mu4e-state mu4e-main-mode-map "k"               previous-line)
     (,evil-mu4e-state mu4e-main-mode-map "u"               mu4e-update-mail-and-index)
-    (,evil-mu4e-state mu4e-main-mode-map "gr"              mu4e-update-mail-and-index)
     (,evil-mu4e-state mu4e-main-mode-map "b"               mu4e-headers-search-bookmark)
     (,evil-mu4e-state mu4e-main-mode-map "N"               mu4e-news)
     (,evil-mu4e-state mu4e-main-mode-map ";"               mu4e-context-switch)
     (,evil-mu4e-state mu4e-main-mode-map "H"               mu4e-display-manual)
+    (,evil-mu4e-state mu4e-main-mode-map ,(kbd "SPC")      ,md/leader-map)
 
     (,evil-mu4e-state mu4e-headers-mode-map "J"            mu4e~headers-jump-to-maildir)
     (,evil-mu4e-state mu4e-headers-mode-map "j"            next-line)
@@ -86,11 +86,17 @@
     (,evil-mu4e-state mu4e-headers-mode-map "/"            mu4e-headers-search-narrow)
     (,evil-mu4e-state mu4e-headers-mode-map "?"            mu4e-headers-mark-for-unread)
     (,evil-mu4e-state mu4e-headers-mode-map "!"            mu4e-headers-mark-for-read)
+    (,evil-mu4e-state mu4e-headers-mode-map "\C-n"         mu4e-headers-next)
+    (,evil-mu4e-state mu4e-headers-mode-map "\C-p"         mu4e-headers-prev)
     (,evil-mu4e-state mu4e-headers-mode-map "\C-j"         mu4e-headers-next)
     (,evil-mu4e-state mu4e-headers-mode-map "\C-k"         mu4e-headers-prev)
-    (,evil-mu4e-state mu4e-headers-mode-map "T"           (lambda ()
-                                                          (interactive)
-                                                          (mu4e-headers-mark-thread nil '(read))))
+    (,evil-mu4e-state mu4e-headers-mode-map "V"            mu4e-headers-toggle-skip-duplicates)
+    (,evil-mu4e-state mu4e-headers-mode-map "W"            mu4e-headers-toggle-include-related)
+    (,evil-mu4e-state mu4e-headers-mode-map "t"            mu4e-headers-mark-subthread)
+    (,evil-mu4e-state mu4e-headers-mode-map "T"            mu4e-headers-mark-thread)
+    (,evil-mu4e-state mu4e-headers-mode-map "+"            mu4e-headers-mark-for-flag)
+    (,evil-mu4e-state mu4e-headers-mode-map "-"            mu4e-headers-mark-for-unflag)
+    (,evil-mu4e-state mu4e-headers-mode-map ,(kbd "SPC")   ,md/leader-map)
 
     (,evil-mu4e-state mu4e-view-mode-map "h"               mu4e-view-toggle-html)
     (,evil-mu4e-state mu4e-view-mode-map "e"               mu4e-view-save-attachment)
@@ -99,14 +105,13 @@
     (,evil-mu4e-state mu4e-view-mode-map "J"               mu4e~headers-jump-to-maildir)
     (,evil-mu4e-state mu4e-view-mode-map "\C-j"            mu4e-view-headers-next)
     (,evil-mu4e-state mu4e-view-mode-map "\C-k"            mu4e-view-headers-prev)
+    (,evil-mu4e-state mu4e-view-mode-map "\C-n"            mu4e-view-headers-next)
+    (,evil-mu4e-state mu4e-view-mode-map "\C-p"            mu4e-view-headers-prev)
     (,evil-mu4e-state mu4e-view-mode-map "?"               mu4e-view-mark-for-unread)
     (,evil-mu4e-state mu4e-view-mode-map "!"               mu4e-view-mark-for-read)
     (,evil-mu4e-state mu4e-view-mode-map "R"               mu4e-compose-reply)
     (,evil-mu4e-state mu4e-view-mode-map "F"               mu4e-compose-forward)
-    (,evil-mu4e-state mu4e-view-mode-map "\C-u"            evil-scroll-up)
-    (,evil-mu4e-state mu4e-view-mode-map "T"               (lambda ()
-                                                           (interactive)
-                                                           (mu4e-headers-mark-thread nil '(read)))))
+    (,evil-mu4e-state mu4e-view-mode-map ,(kbd "SPC")      ,md/leader-map))
   "All evil-mu4e bindings.")
 
 (defun evil-mu4e-set-bindings ()
@@ -115,7 +120,7 @@
     (evil-define-key
       (nth 0 binding) (nth 1 binding) (nth 2 binding) (nth 3 binding))))
 
-
+
 ;;; Update mu4e-main-view
 ;;; To avoid confusing the main-view is updated to show the keys that are in use
 ;;; for evil-mu4e.
@@ -141,7 +146,7 @@
 (defvar evil-mu4e-new-region-misc
   (concat
    (mu4e~main-action-str "\t* [;]Switch focus\n" 'mu4e-context-switch)
-   (mu4e~main-action-str "\t* [u]pdate email & database (Alternatively: gr)\n"
+   (mu4e~main-action-str "\t* [u]pdate email & database\n"
                          'mu4e-update-mail-and-index)
 
    ;; show the queue functions if `smtpmail-queue-dir' is defined
@@ -178,7 +183,7 @@
   )
 
 
-
+
 ;;; Initialize evil-mu4e
 
 (defun evil-mu4e-init ()
